@@ -1,0 +1,4 @@
+DROP TABLE IF EXISTS transactions;
+DROP TABLE IF EXISTS withdraws;
+DROP TABLE IF EXISTS orders;
+DROP TABLE IF EXISTS users;
