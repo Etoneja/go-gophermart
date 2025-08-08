@@ -7,5 +7,6 @@ import (
 )
 
 type AccrualClienter interface {
+	IsRateLimited() bool
 	GetOrder(ctx context.Context, orderID string) (*models.AccrualOrderModel, error)
 }

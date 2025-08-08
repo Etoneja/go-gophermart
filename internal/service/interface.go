@@ -7,6 +7,7 @@ import (
 )
 
 type Servicer interface {
+	IsAccrualSytemBusy() bool
 	RegisterUser(ctx context.Context, login, password string) (*models.UserModel, string, error)
 	LoginUser(ctx context.Context, login, password string) (*models.UserModel, string, error)
 	ValidateToken(tokenString string) (string, error)

@@ -39,6 +39,10 @@ func NewService(cfg *config.Config, dbPool *pgxpool.Pool, logger zerolog.Logger)
 	}
 }
 
+func (s *Service) IsAccrualSytemBusy() bool {
+	return s.accrualClient.IsRateLimited()
+}
+
 func (s *Service) RegisterUser(ctx context.Context, login, password string) (*models.UserModel, string, error) {
 	hashedPassword, err := models.HashPassword(password)
 	if err != nil {

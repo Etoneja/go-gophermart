@@ -48,6 +48,11 @@ func (p *OrderProcessor) Run(ctx context.Context) {
 }
 
 func (p *OrderProcessor) processOrders(ctx context.Context) {
+	if p.svc.IsAccrualSytemBusy() {
+		p.logger.Info().Msg("Accrual system is busy, skip processing")
+		return
+	}
+
 	orders, err := p.svc.GetOrdersToSync(ctx, p.cfg.WorkerPoolSize)
 	if err != nil {
 		p.logger.Error().Err(err).Msg("Failed to get pending orders")
@@ -77,6 +82,11 @@ func (p *OrderProcessor) processOrders(ctx context.Context) {
 			go func(orderID string) {
 				defer batchWg.Done()
 				defer func() { <-sem }()
+
+				if p.svc.IsAccrualSytemBusy() {
+					p.logger.Info().Str("orderID", orderID).Msg("Skip order due to accrual system is busy")
+					return
+				}
 
 				if err := p.svc.SyncOrder(ctx, orderID); err != nil {
 					p.logger.Error().Err(err).Str("orderID", orderID).Msg("Order processing failed")
