@@ -50,7 +50,8 @@ func (h *Handlers) CreateOrderHandler(c *gin.Context) {
 		if errors.Is(err, errs.ErrOrderExists) {
 			oldOrder, err := h.svc.GetOrder(c.Request.Context(), order.ID)
 			if err != nil {
-				c.JSON(http.StatusInternalServerError, gin.H{"error": "err fetching old order on conflict"})
+				h.logger.Error().Err(err).Msg("err fetching old order on conflict")
+				c.JSON(http.StatusInternalServerError, gin.H{"error": http.StatusText(http.StatusInternalServerError)})
 				return
 			}
 			if order.UserID == oldOrder.UserID {
@@ -62,7 +63,7 @@ func (h *Handlers) CreateOrderHandler(c *gin.Context) {
 		}
 
 		h.logger.Error().Err(err).Msg("Failed to create order")
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to create order"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": http.StatusText(http.StatusInternalServerError)})
 		return
 	}
 
@@ -79,7 +80,7 @@ func (h *Handlers) GetOrdersHandler(c *gin.Context) {
 	orders, err := h.svc.GetOrdersForUser(c.Request.Context(), user)
 	if err != nil {
 		h.logger.Error().Err(err).Msg("Failed to get orders")
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to get orders"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": http.StatusText(http.StatusInternalServerError)})
 		return
 	}
 

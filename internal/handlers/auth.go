@@ -35,7 +35,7 @@ func (h *Handlers) RegisterUserHandler(c *gin.Context) {
 			return
 		}
 		h.logger.Error().Err(err).Msg("Failed to register user")
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to register user"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": http.StatusText(http.StatusInternalServerError)})
 		return
 	}
 

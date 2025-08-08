@@ -21,7 +21,7 @@ func (h *Handlers) GetBalanceHandler(c *gin.Context) {
 	balance, err := h.svc.GetUserBalance(c.Request.Context(), user.UUID)
 	if err != nil {
 		log.Error().Err(err).Msg("Failed to get balance")
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to get balance"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": http.StatusText(http.StatusInternalServerError)})
 		return
 	}
 
@@ -38,7 +38,7 @@ func (h *Handlers) GetWithdrawalsHandler(c *gin.Context) {
 	withdrawals, err := h.svc.GetUserWithdrawals(c.Request.Context(), user.UUID)
 	if err != nil {
 		log.Error().Err(err).Msg("Failed to get withdrawals")
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to get withdrawals"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": http.StatusText(http.StatusInternalServerError)})
 		return
 	}
 
@@ -86,7 +86,8 @@ func (h *Handlers) CreateWithdrawHandler(c *gin.Context) {
 			c.JSON(http.StatusPaymentRequired, gin.H{"error": "insufficient funds"})
 			return
 		}
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to get balance"})
+		h.logger.Error().Err(err).Msg("Failed to create withdraw")
+		c.JSON(http.StatusInternalServerError, gin.H{"error": http.StatusText(http.StatusInternalServerError)})
 		return
 	}
 

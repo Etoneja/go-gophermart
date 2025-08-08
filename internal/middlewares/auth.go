@@ -16,7 +16,7 @@ func (m *Middlewares) AuthMiddleware() gin.HandlerFunc {
 
 		login, err := m.svc.ValidateToken(tokenString)
 		if err != nil {
-			m.logger.Warn().Err(err).Msg("Invalid token")
+			m.logger.Debug().Err(err).Msg("Invalid token")
 			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "invalid token"})
 			return
 		}
