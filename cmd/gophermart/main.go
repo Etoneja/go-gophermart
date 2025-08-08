@@ -13,7 +13,7 @@ import (
 )
 
 func main() {
-	ctx, cancel := context.WithCancel(context.Background())
+	ctx, cancel := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
 	defer cancel()
 
 	sigChan := make(chan os.Signal, 1)
@@ -29,11 +29,8 @@ func main() {
 		baseLogger.Fatal().Err(err).Msg("Failed to initialize application")
 	}
 
-	processorCtx, processorCancel := context.WithCancel(ctx)
-	defer processorCancel()
-
 	processor := processor.NewOrderProcessor(application.Config, application.DB, processorLogger)
-	go processor.Run(processorCtx)
+	go processor.Run(ctx)
 
 	serverErrChan := make(chan error, 1)
 	go func() {
@@ -41,11 +38,12 @@ func main() {
 	}()
 
 	select {
-	case sig := <-sigChan:
-		baseLogger.Info().Msgf("Received signal %v, initiating shutdown...", sig)
+	case <-ctx.Done():
+		baseLogger.Info().Msgf("Received shutdown signal, initiating graceful shutdown...")
 	case err := <-serverErrChan:
 		if err != nil {
 			baseLogger.Error().Err(err).Msg("Server error, initiating shutdown...")
+			cancel()
 		}
 	}
 
@@ -57,8 +55,6 @@ func main() {
 	if err := application.Shutdown(shutdownCtx); err != nil {
 		baseLogger.Error().Err(err).Msg("Error during server shutdown")
 	}
-
-	processorCancel()
 
 	processor.Stop()
 
