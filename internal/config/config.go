@@ -29,16 +29,16 @@ func LoadConfig() (*Config, error) {
 	flag.DurationVar(&cfg.WorkerInterval, "worker-interval", 5*time.Second, "Worker processing interval")
 	flag.Parse()
 
-	if envServerAddress := os.Getenv("RUN_ADDRESS"); envServerAddress != "" {
+	if envServerAddress, exists := os.LookupEnv("RUN_ADDRESS"); exists {
 		cfg.ServerAddress = envServerAddress
 	}
-	if envDatabaseURL := os.Getenv("DATABASE_URI"); envDatabaseURL != "" {
+	if envDatabaseURL, exists := os.LookupEnv("DATABASE_URI"); exists {
 		cfg.DatabaseURL = envDatabaseURL
 	}
-	if envJWTSecret := os.Getenv("JWT_SECRET"); envJWTSecret != "" {
+	if envJWTSecret, exists := os.LookupEnv("JWT_SECRET"); exists {
 		cfg.JWTSecret = envJWTSecret
 	}
-	if envAccrualSystemAddress := os.Getenv("ACCRUAL_SYSTEM_ADDRESS"); envAccrualSystemAddress != "" {
+	if envAccrualSystemAddress, exists := os.LookupEnv("ACCRUAL_SYSTEM_ADDRESS"); exists {
 		cfg.AccrualSystemAddress = envAccrualSystemAddress
 	}
 
